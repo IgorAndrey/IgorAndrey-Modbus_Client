@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.CodeDom;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -106,7 +107,7 @@ namespace modbus_client
     }
 
 
-
+    //Поверочный комментарий
     public void Connect()
 		{
 			if (serport.Contains("COM"))
