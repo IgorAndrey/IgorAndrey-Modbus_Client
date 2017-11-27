@@ -393,44 +393,53 @@ namespace modbus_client
       string comname = comboBox1.Text;
       string paritycb = comboBox3.Text;
       string stopbcb = comboBox4.Text;
+            string ipaddres = maskedTextBox5.Text;
+            int ipport =  Convert.ToInt32( maskedTextBox6.Text);
 
-			panel1.Enabled = false;
+            panel1.Enabled = false;
 			panel2.Enabled = false;
 			panel3.Enabled = false;
 
-			if (modbusClient == null)
-      {
-        modbusClient = new ExModbusClient(comname);
+            if (modbusClient == null && radioButton1.Checked)
+            {
+                modbusClient = new ExModbusClient(comname);
 
-        int combd = 9600;
-        try { combd = int.Parse(comboBox2.Text); }
-        catch { combd = 9600; comboBox2.Text = "9600"; };
-        modbusClient.Baudrate = combd;
+                int combd = 9600;
+                try { combd = int.Parse(comboBox2.Text); }
+                catch { combd = 9600; comboBox2.Text = "9600"; };
+                modbusClient.Baudrate = combd;
 
-        try
-        {
-          modbusClient.Parity = (Parity)Enum.Parse(typeof(Parity), paritycb);
-        }
-        catch
-        {
-          paritycb = "None";
-          modbusClient.Parity = (Parity)Enum.Parse(typeof(Parity), paritycb);
-          comboBox3.Text = paritycb;
-        }
+                try
+                {
+                    modbusClient.Parity = (Parity)Enum.Parse(typeof(Parity), paritycb);
+                }
+                catch
+                {
+                    paritycb = "None";
+                    modbusClient.Parity = (Parity)Enum.Parse(typeof(Parity), paritycb);
+                    comboBox3.Text = paritycb;
+                }
 
-        try
-        {
-          modbusClient.StopBits = (StopBits)Enum.Parse(typeof(StopBits), stopbcb);
-        }
-        catch
-        {
-          stopbcb = "One";
-          modbusClient.StopBits = (StopBits)Enum.Parse(typeof(StopBits), stopbcb);
-          comboBox4.Text = stopbcb;
-        }
-        modbusClient.LogDataText += LogDataTextBox;
-        modbusClient.Connect();
-      }
+                try
+                {
+                    modbusClient.StopBits = (StopBits)Enum.Parse(typeof(StopBits), stopbcb);
+                }
+                catch
+                {
+                    stopbcb = "One";
+                    modbusClient.StopBits = (StopBits)Enum.Parse(typeof(StopBits), stopbcb);
+                    comboBox4.Text = stopbcb;
+                }
+                modbusClient.LogDataText += LogDataTextBox;
+                modbusClient.Connect();
+            }
+            else if(modbusClient == null && radioButton2.Checked) {
+                Console.WriteLine("TCP");
+                modbusClient = new ExModbusClient(ipaddres, ipport);
+                modbusClient.LogDataText += LogDataTextBox;
+                modbusClient.Connect();
+
+            }
     }
 
     private void button2_Click(object sender, EventArgs e)

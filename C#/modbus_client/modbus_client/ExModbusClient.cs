@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using EasyModbus;
 
+
 public class ReadDataArgs
 {
 	public ReadDataArgs(UInt16[] __data) { _data = __data; }
@@ -77,6 +78,7 @@ namespace modbus_client
     public ExModbusClient(string _serport)
 		{
 			serport = _serport;
+
 			timer = new System.Timers.Timer {
 				Enabled = false,
 				Interval = ScanRate,
@@ -84,7 +86,19 @@ namespace modbus_client
 			timer.Elapsed += OnTimedEvent;
 		}
 
-		string receiveData = "";
+        public ExModbusClient(string _ipaddress,int ipport)
+        {
+            serport = "TCP";
+            modbusClient = new ModbusClient(_ipaddress, ipport);
+            timer = new System.Timers.Timer
+            {
+                Enabled = false,
+                Interval = ScanRate,
+            };
+            timer.Elapsed += OnTimedEvent;
+        }
+
+        string receiveData = "";
 		void UpdateReceiveData(object sender)
 		{
       receiveData = DateTime.Now.ToString("HH:mm:ss:fff") + " : " + "Rx: " + BitConverter.ToString(modbusClient.receiveData).Replace("-", " ") + System.Environment.NewLine;
@@ -110,20 +124,28 @@ namespace modbus_client
     //Поверочный комментарий
     public void Connect()
 		{
-			if (serport.Contains("COM"))
-			{
-				if (modbusClient == null) modbusClient = new ModbusClient(serport);
-				modbusClient.receiveDataChanged += new ModbusClient.ReceiveDataChanged(UpdateReceiveData);
-				modbusClient.sendDataChanged += new ModbusClient.SendDataChanged(UpdateSendData);
-        modbusClient.LogDataChanged += new ModbusClient.LogChanged(UpdateLogData);
-        modbusClient.Baudrate = Baudrate;
-				modbusClient.Parity = Parity;
-				modbusClient.StopBits = StopBits;
-				modbusClient.NumberOfRetries = 3;
-				modbusClient.Connect();
-				Connected = modbusClient.Connected;
-			}
-		}
+            if (serport.Contains("COM"))
+            {
+                if (modbusClient == null) modbusClient = new ModbusClient(serport);
+                modbusClient.receiveDataChanged += new ModbusClient.ReceiveDataChanged(UpdateReceiveData);
+                modbusClient.sendDataChanged += new ModbusClient.SendDataChanged(UpdateSendData);
+                modbusClient.LogDataChanged += new ModbusClient.LogChanged(UpdateLogData);
+                modbusClient.Baudrate = Baudrate;
+                modbusClient.Parity = Parity;
+                modbusClient.StopBits = StopBits;
+                modbusClient.NumberOfRetries = 3;
+                modbusClient.Connect();
+                Connected = modbusClient.Connected;
+            }
+            else if (serport.Contains("TCP")){
+                modbusClient.receiveDataChanged += new ModbusClient.ReceiveDataChanged(UpdateReceiveData);
+                modbusClient.sendDataChanged += new ModbusClient.SendDataChanged(UpdateSendData);
+                modbusClient.LogDataChanged += new ModbusClient.LogChanged(UpdateLogData);
+                modbusClient.Connect();
+                Connected = modbusClient.Connected;
+            }
+
+        }
 
 		public void Disconnect()
 		{
